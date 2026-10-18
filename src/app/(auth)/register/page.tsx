@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Button from "@/components/ui/Button";
+import Input from "@/components/ui/Input";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -43,62 +45,41 @@ export default function RegisterPage() {
       <h1 className="text-2xl font-semibold mb-6">Create account</h1>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        <div className="flex flex-col gap-1">
-          <label htmlFor="name" className="text-sm font-medium">
-            Name
-          </label>
-          <input
-            id="name"
-            name="name"
-            type="text"
-            autoComplete="name"
-            required
-            minLength={2}
-            className="border rounded-md px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-black"
-          />
-        </div>
-
-        <div className="flex flex-col gap-1">
-          <label htmlFor="email" className="text-sm font-medium">
-            Email
-          </label>
-          <input
-            id="email"
-            name="email"
-            type="email"
-            autoComplete="email"
-            required
-            className="border rounded-md px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-black"
-          />
-        </div>
-
-        <div className="flex flex-col gap-1">
-          <label htmlFor="password" className="text-sm font-medium">
-            Password
-          </label>
-          <input
-            id="password"
-            name="password"
-            type="password"
-            autoComplete="new-password"
-            required
-            minLength={8}
-            className="border rounded-md px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-black"
-          />
-        </div>
+        <Input
+          id="name"
+          name="name"
+          type="text"
+          label="Name"
+          autoComplete="name"
+          required
+          minLength={2}
+        />
+        <Input
+          id="email"
+          name="email"
+          type="email"
+          label="Email"
+          autoComplete="email"
+          required
+        />
+        <Input
+          id="password"
+          name="password"
+          type="password"
+          label="Password"
+          autoComplete="new-password"
+          required
+          minLength={8}
+        />
 
         {error && <p className="text-sm text-red-600">{error}</p>}
 
-        <button
-          type="submit"
-          disabled={loading}
-          className="bg-black text-white rounded-md py-2 text-sm font-medium hover:bg-neutral-800 disabled:opacity-50 transition-colors"
-        >
+        <Button type="submit" disabled={loading} className="w-full">
           {loading ? "Creating account…" : "Register"}
-        </button>
+        </Button>
       </form>
 
-      <p className="mt-4 text-sm text-center text-neutral-500">
+      <p className="mt-4 text-sm text-center text-gray-500">
         Already have an account?{" "}
         <Link href="/login" className="text-black font-medium hover:underline">
           Log in
