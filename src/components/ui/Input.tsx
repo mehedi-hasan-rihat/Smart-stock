@@ -1,7 +1,7 @@
 import type { InputHTMLAttributes } from "react";
 
 type Props = InputHTMLAttributes<HTMLInputElement> & {
-  label: string;
+  label?: string;
 };
 
 const inputClass =
@@ -10,9 +10,11 @@ const inputClass =
 export default function Input({ label, id, ...rest }: Props) {
   return (
     <div className="flex flex-col gap-1">
-      <label htmlFor={id} className="text-sm font-medium">
-        {label}
-      </label>
+      {label && (
+        <label htmlFor={id} className="text-sm font-medium">
+          {label}
+        </label>
+      )}
       <input id={id} className={inputClass} {...rest} />
     </div>
   );

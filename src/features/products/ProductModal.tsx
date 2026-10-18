@@ -4,6 +4,7 @@ import { useState } from "react";
 import Modal from "@/components/ui/Modal";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
+import { useToast } from "@/components/ui/Toast";
 import type { Product } from "@/features/products/types";
 
 type Props = {
@@ -15,6 +16,7 @@ type Props = {
 export default function ProductModal({ product, onSaved, onClose }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const { success, error: toastError } = useToast();
 
   async function handleSubmit(e: React.SubmitEvent) {
     e.preventDefault();
@@ -39,11 +41,14 @@ export default function ProductModal({ product, onSaved, onClose }: Props) {
 
     if (!res.ok) {
       const data = await res.json();
-      setError(typeof data.error === "string" ? data.error : "Something went wrong.");
+      const msg = typeof data.error === "string" ? data.error : "Something went wrong.";
+      setError(msg);
+      toastError(msg);
       return;
     }
 
     const saved = await res.json();
+    success(product ? "Product updated." : "Product created.");
     onSaved({ ...saved, price: saved.price.toString() });
   }
 

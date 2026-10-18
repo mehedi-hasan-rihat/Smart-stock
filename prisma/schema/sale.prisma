@@ -1,0 +1,21 @@
+model Sale {
+  id           String     @id @default(cuid())
+  merchantId   String
+  merchant     Merchant   @relation(fields: [merchantId], references: [id])
+  customerName String?
+  customerEmail String?
+  items        SaleItem[]
+  createdAt    DateTime   @default(now())
+}
+
+model SaleItem {
+  id         String  @id @default(cuid())
+  saleId     String
+  sale       Sale    @relation(fields: [saleId], references: [id])
+  productId  String
+  product    Product @relation(fields: [productId], references: [id])
+  quantity   Int
+  // snapshot of product state at time of sale
+  productName String
+  unitPrice   Decimal @db.Decimal(10, 2)
+}

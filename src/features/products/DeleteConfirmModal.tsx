@@ -3,21 +3,29 @@
 import { useState } from "react";
 import Modal from "@/components/ui/Modal";
 import Button from "@/components/ui/Button";
+import { useToast } from "@/components/ui/Toast";
 import type { Product } from "@/features/products/types";
 
 type Props = {
   product: Product;
-  onConfirm: () => void;
+  onConfirm: () => Promise<void> | void;
   onClose: () => void;
 };
 
 export default function DeleteConfirmModal({ product, onConfirm, onClose }: Props) {
   const [loading, setLoading] = useState(false);
+  const { success: toastSuccess, error: toastError } = useToast();
 
   async function handleConfirm() {
     setLoading(true);
-    onConfirm();
-    setLoading(false);
+    try {
+      await onConfirm();
+      toastSuccess(`"${product.name}" deleted.`);
+    } catch {
+      toastError("Failed to delete product.");
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (

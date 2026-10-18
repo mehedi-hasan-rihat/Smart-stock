@@ -5,4 +5,5 @@ model Merchant {
   password  String
   createdAt DateTime  @default(now())
   products  Product[]
+  sales     Sale[]
 }
