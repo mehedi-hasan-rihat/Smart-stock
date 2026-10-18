@@ -8,6 +8,17 @@ async function getOwned(id: string, merchantId: string) {
   return product;
 }
 
+export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const session = await getSession();
+  if (!session) return Response.json({ error: "Unauthorized" }, { status: 401 });
+
+  const { id } = await params;
+  const product = await getOwned(id, session.sub);
+  if (!product) return Response.json({ error: "Not found" }, { status: 404 });
+
+  return Response.json(product);
+}
+
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const session = await getSession();
   if (!session) return Response.json({ error: "Unauthorized" }, { status: 401 });
