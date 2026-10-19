@@ -1,3 +1,4 @@
+import { revalidateTag } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
 import { productSchema } from "@/lib/schemas/product";
@@ -35,6 +36,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     data: parsed.data,
   });
 
+  revalidateTag(`products-${session.sub}`, { expire: 0 });
   return Response.json(updated);
 }
 
@@ -48,5 +50,6 @@ export async function DELETE(_req: Request, { params }: { params: Promise<{ id: 
 
   await prisma.product.delete({ where: { id } });
 
+  revalidateTag(`products-${session.sub}`, { expire: 0 });
   return new Response(null, { status: 204 });
 }

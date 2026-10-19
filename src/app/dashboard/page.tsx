@@ -3,6 +3,8 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { verifyToken, COOKIE } from "@/lib/session";
 
+export const instant = false;
+
 async function Overview() {
   const store = await cookies();
   const token = store.get(COOKIE)?.value;

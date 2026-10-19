@@ -1,27 +1,26 @@
-import { cookies } from "next/headers";
+import { Suspense } from "react";
+import { getSession } from "@/lib/auth";
+import { getCachedProducts } from "@/lib/cache";
+import { redirect } from "next/navigation";
 import ProductsView from "@/features/products/ProductsView";
-import type { Product } from "@/features/products/types";
 
-const BASE = process.env.APP_URL || "http://localhost:3000";
+export const instant = false;
 
-async function getProducts(cookie: string): Promise<Product[]> {
-  const res = await fetch(`${BASE}/api/products`, {
-    headers: { cookie },
-    cache: "no-store",
-  });
-  if (!res.ok) return [];
-  const data = await res.json();
-  return (data as Product[]).map((p) => ({ ...p, price: String(p.price) }));
+async function Products() {
+  const session = await getSession();
+  if (!session) redirect("/login");
+
+  const products = await getCachedProducts(session.sub);
+  return <ProductsView initial={products} />;
 }
 
-export default async function ProductsPage() {
-  const storeCookies = await cookies();
-  const products = await getProducts(storeCookies.toString());
-
+export default function ProductsPage() {
   return (
     <div>
       <h1 className="text-xl font-semibold mb-6">Products</h1>
-      <ProductsView initial={products} />
+      <Suspense fallback={<p className="text-sm text-neutral-400">Loading…</p>}>
+        <Products />
+      </Suspense>
     </div>
   );
 }

@@ -1,3 +1,4 @@
+import { revalidateTag } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
 import { productSchema } from "@/lib/schemas/product";
@@ -25,5 +26,6 @@ export async function POST(req: Request) {
     data: { ...parsed.data, merchantId: session.sub },
   });
 
+  revalidateTag(`products-${session.sub}`, { expire: 0 });
   return Response.json(product, { status: 201 });
 }

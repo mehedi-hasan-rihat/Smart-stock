@@ -5,7 +5,6 @@ import { RxHamburgerMenu, RxCross2 } from "react-icons/rx";
 import Link from "next/link";
 
 const nav = [
-  { href: "/dashboard", label: "Overview" },
   { href: "/dashboard/products", label: "Products" },
   { href: "/dashboard/sales", label: "Sales" },
 ];

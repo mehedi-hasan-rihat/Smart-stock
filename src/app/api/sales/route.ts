@@ -1,3 +1,4 @@
+import { revalidateTag } from "next/cache";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
@@ -91,6 +92,9 @@ export async function POST(req: Request) {
 
     return created;
   });
+
+  revalidateTag(`products-${session.sub}`, { expire: 0 });
+  revalidateTag(`sales-${session.sub}`, { expire: 0 });
 
   return Response.json(sale, { status: 201 });
 }
