@@ -13,6 +13,29 @@ const schema = z.object({
   ).min(1),
 });
 
+export async function GET(req: Request) {
+  const session = await getSession();
+  if (!session) return Response.json({ error: "Unauthorized" }, { status: 401 });
+
+  const { searchParams } = new URL(req.url);
+  const page  = Math.max(1, Number(searchParams.get("page")  ?? 1));
+  const limit = Math.min(50, Math.max(1, Number(searchParams.get("limit") ?? 20)));
+  const skip  = (page - 1) * limit;
+
+  const [sales, total] = await Promise.all([
+    prisma.sale.findMany({
+      where: { merchantId: session.sub },
+      orderBy: { createdAt: "desc" },
+      skip,
+      take: limit,
+      include: { items: true },
+    }),
+    prisma.sale.count({ where: { merchantId: session.sub } }),
+  ]);
+
+  return Response.json({ sales, total, page, limit });
+}
+
 export async function POST(req: Request) {
   const session = await getSession();
   if (!session) return Response.json({ error: "Unauthorized" }, { status: 401 });

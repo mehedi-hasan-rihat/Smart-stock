@@ -7,6 +7,7 @@ import Link from "next/link";
 const nav = [
   { href: "/dashboard", label: "Overview" },
   { href: "/dashboard/products", label: "Products" },
+  { href: "/dashboard/sales", label: "Sales" },
 ];
 
 function Sidebar({ onClose }: { onClose?: () => void }) {
@@ -50,7 +51,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="min-h-screen flex">
+    <div className="h-screen flex overflow-hidden">
       {/* desktop sidebar */}
       <aside className="hidden md:flex flex-col w-56 border-r border-gray-300 shrink-0">
         <Sidebar />
@@ -72,8 +73,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <Sidebar onClose={() => setOpen(false)} />
       </aside>
 
-      <div className="flex-1 flex flex-col min-w-0">
-        <header className="md:hidden flex items-center gap-3 px-4 py-3 border-b border-gray-300">
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+        <header className="md:hidden flex items-center gap-3 px-4 py-3 border-b border-gray-300 shrink-0">
           <button
             onClick={() => setOpen(true)}
             className="text-gray-700 hover:text-black"
@@ -84,7 +85,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <span className="font-semibold text-sm">SmartStock</span>
         </header>
 
-        <main className="flex-1 p-6 md:p-8">{children}</main>
+        <main className="flex-1 overflow-y-auto p-6 md:p-8">{children}</main>
       </div>
     </div>
   );
