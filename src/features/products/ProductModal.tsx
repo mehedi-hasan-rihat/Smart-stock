@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Modal from "@/components/ui/Modal";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
@@ -16,7 +16,49 @@ type Props = {
 export default function ProductModal({ product, onSaved, onClose }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [generating, setGenerating] = useState(false);
+  const [nameValue, setNameValue] = useState(product?.name ?? "");
+  const descRef = useRef<HTMLTextAreaElement>(null);
   const { success, error: toastError } = useToast();
+
+  async function handleGenerateDescription() {
+    const name = nameValue.trim();
+    const notes = descRef.current?.value.trim();
+
+    if (!name) {
+      toastError("Enter a product name first.");
+      return;
+    }
+    if (!notes) {
+      toastError("Add some notes in the description field before generating.");
+      return;
+    }
+
+    setGenerating(true);
+    try {
+      const res = await fetch("/api/ai/describe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, notes }),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        const msg = typeof data.error === "string" ? data.error : "Generation failed.";
+        toastError(msg);
+        return;
+      }
+
+      if (descRef.current) {
+        descRef.current.value = data.description;
+      }
+      success("Description generated.");
+    } catch {
+      toastError("Network error — please try again.");
+    } finally {
+      setGenerating(false);
+    }
+  }
 
   async function handleSubmit(e: React.SubmitEvent) {
     e.preventDefault();
@@ -62,18 +104,32 @@ export default function ProductModal({ product, onSaved, onClose }: Props) {
           label="Title"
           required
           minLength={2}
-          defaultValue={product?.name}
+          value={nameValue}
+          onChange={(e) => setNameValue(e.target.value)}
         />
 
         <div className="flex flex-col gap-1">
-          <label htmlFor="description" className="text-sm font-medium">
-            Description
-          </label>
+          <div className="flex items-center justify-between">
+            <label htmlFor="description" className="text-sm font-medium">
+              Description
+            </label>
+            <button
+              type="button"
+              onClick={handleGenerateDescription}
+              disabled={generating}
+              className="text-xs text-gray-500 hover:text-black disabled:opacity-50 transition-colors"
+            >
+              {generating ? "Generating…" : "✦ AI generate"}
+            </button>
+          </div>
           <textarea
             id="description"
             name="description"
             defaultValue={product?.description ?? ""}
+            ref={descRef}
+            placeholder="Add brief notes and AI will expand them into a full description."
             className="border border-gray-300 rounded-md px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-black resize-none"
+            rows={3}
           />
         </div>
 
