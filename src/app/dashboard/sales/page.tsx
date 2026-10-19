@@ -4,22 +4,20 @@ import { getCachedSales } from "@/lib/cache";
 import { redirect } from "next/navigation";
 import SalesView from "@/features/sales/SalesView";
 
-export const instant = false;
-
-async function Sales() {
-  const session = await getSession();
-  if (!session) redirect("/login");
-
-  const data = await getCachedSales(session.sub);
+async function SalesList({ merchantId }: { merchantId: string }) {
+  const data = await getCachedSales(merchantId);
   return <SalesView initial={data} />;
 }
 
-export default function SalesPage() {
+export default async function SalesPage() {
+  const session = await getSession();
+  if (!session) redirect("/login");
+
   return (
     <div>
       <h1 className="text-xl font-semibold mb-6">Sales</h1>
       <Suspense fallback={<p className="text-sm text-neutral-400">Loading…</p>}>
-        <Sales />
+        <SalesList merchantId={session.sub} />
       </Suspense>
     </div>
   );
